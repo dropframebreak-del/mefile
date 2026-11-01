@@ -5,3 +5,9 @@ data/
 .DS_Store
 Thumbs.db
 .vscode/
+
+generated_documents/
+.agents/
+skills-lock.json
+opencode.json
+.env

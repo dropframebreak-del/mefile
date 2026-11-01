@@ -3,36 +3,34 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Minutes — local meeting reports</title>
+    <title>mefile — local meeting reports</title>
     <meta
       name="description"
       content="Turn messy meeting notes into a clean, structured PDF report using a local AI model. Nothing leaves your machine."
     />
-    <meta name="theme-color" content="#4f46e5" />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234f46e5'/%3E%3Cpath d='M18 20h28M18 32h28M18 44h18' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <meta name="theme-color" content="#ffc8dd" />
+    <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
     <link rel="stylesheet" href="/css/app.css" />
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="#/library" aria-label="Minutes home">
+      <a class="brand" href="#/library" aria-label="mefile home">
         <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round">
-            <path d="M5 7h14M5 12h14M5 17h9" />
-          </svg>
+          <img src="/logo.jpeg" alt="mefile logo" />
         </span>
         <span class="brand-text">
-          <strong>Minutes</strong>
+          <strong>mefile</strong>
           <small>local meeting reports</small>
         </span>
       </a>
 
       <nav class="nav" aria-label="Main">
-        <button class="nav-link" data-nav="library">Library</button>
-        <button class="nav-link" data-nav="new">New report</button>
-        <button class="nav-link" data-nav="settings">Settings</button>
+        <button class="nav-link" data-nav="library" type="button">Library</button>
+        <button class="nav-link" data-nav="new" type="button">New report</button>
+        <button class="nav-link" data-nav="settings" type="button">Settings</button>
       </nav>
 
-      <button id="ai-pill" class="ai-pill" title="AI server status">
+      <button id="ai-pill" class="ai-pill" type="button" title="AI server status" aria-label="AI server status">
         <span class="dot"></span>
         <span id="ai-pill-text">Checking AI…</span>
       </button>
@@ -45,7 +43,7 @@
             <h1>Your meetings</h1>
             <p class="sub">Notes in, clean reports out. Everything stays on this machine.</p>
           </div>
-          <button class="btn primary" data-nav="new">
+          <button class="btn primary" data-nav="new" type="button">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
             New report
           </button>
@@ -54,7 +52,7 @@
         <div class="library-toolbar">
           <div class="search">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-            <input id="search-input" type="search" placeholder="Search meetings by title or summary…" autocomplete="off" />
+            <input id="search-input" type="search" placeholder="Search meetings by title or summary…" autocomplete="off" spellcheck="false" />
           </div>
           <span id="library-count" class="muted small"></span>
         </div>
@@ -71,8 +69,8 @@
           <h2>No meetings yet</h2>
           <p>Paste a transcript or upload your notes. The local model turns it into a structured report with decisions, owners and action items.</p>
           <div class="empty-actions">
-            <button class="btn primary" data-nav="new">Create your first report</button>
-            <button id="empty-sample" class="btn ghost">Try the sample meeting</button>
+            <button class="btn primary" data-nav="new" type="button">Create your first report</button>
+            <button id="empty-sample" class="btn ghost" type="button">Try the sample meeting</button>
           </div>
           <ol class="steps">
             <li><span>1</span>Paste notes or a transcript</li>
@@ -101,6 +99,7 @@
               <textarea
                 id="notes-input"
                 spellcheck="false"
+                autocomplete="off"
                 placeholder="Paste your meeting notes, minutes or a transcript here…
 
 Speaker names, timestamps and half-finished sentences are all fine. The cleaner the notes, the better the report."
@@ -113,8 +112,8 @@ Speaker names, timestamps and half-finished sentences are all fine. The cleaner 
                 Upload file
               </label>
               <input id="file-input" type="file" accept=".txt,.md,.markdown,.vtt,.srt,.json,.log" hidden />
-              <button id="load-sample" class="btn ghost small">Load sample</button>
-              <button id="clear-notes" class="btn ghost small danger">Clear</button>
+              <button id="load-sample" class="btn ghost small" type="button">Load sample</button>
+              <button id="clear-notes" class="btn ghost small danger" type="button">Clear</button>
               <span class="hint">Text only · up to 5 MB</span>
             </div>
             <div id="composer-error" class="inline-error" hidden></div>
@@ -124,7 +123,7 @@ Speaker names, timestamps and half-finished sentences are all fine. The cleaner 
             <div class="panel">
               <div class="panel-head">
                 <h2>AI model</h2>
-                <button id="refresh-models" class="icon-btn" title="Refresh models" aria-label="Refresh models">
+                <button id="refresh-models" class="icon-btn" type="button" title="Refresh models" aria-label="Refresh models">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" /></svg>
                 </button>
               </div>
@@ -148,10 +147,10 @@ Speaker names, timestamps and half-finished sentences are all fine. The cleaner 
             <div id="offline-card" class="panel notice warn" hidden>
               <strong>No local model is responding</strong>
               <p>Start Ollama (or another local server) and refresh. The app never sends your notes to the internet.</p>
-              <button class="btn ghost small" data-nav="settings">Open settings</button>
+              <button class="btn ghost small" data-nav="settings" type="button">Open settings</button>
             </div>
 
-            <button id="analyze" class="btn primary block">
+            <button id="analyze" class="btn primary block" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1" /><circle cx="12" cy="12" r="3.5" /></svg>
               Analyse notes
               <kbd>Ctrl ↵</kbd>
@@ -170,11 +169,11 @@ Speaker names, timestamps and half-finished sentences are all fine. The cleaner 
           <a class="back-link" href="#/library">← Library</a>
           <div class="review-actions">
             <span id="save-state" class="save-state"></span>
-            <button id="save-btn" class="btn ghost small">Save</button>
-            <button id="edit-notes" class="btn ghost small">Edit notes</button>
-            <button id="export-md" class="btn ghost small">Markdown</button>
-            <button id="preview-pdf" class="btn ghost small">Preview PDF</button>
-            <button id="export-pdf" class="btn primary small">
+            <button id="save-btn" class="btn ghost small" type="button">Save</button>
+            <button id="edit-notes" class="btn ghost small" type="button">Edit notes</button>
+            <button id="export-md" class="btn ghost small" type="button">Markdown</button>
+            <button id="preview-pdf" class="btn ghost small" type="button">Preview PDF</button>
+            <button id="export-pdf" class="btn primary small" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 20h14" /></svg>
               Download PDF
             </button>
@@ -183,86 +182,46 @@ Speaker names, timestamps and half-finished sentences are all fine. The cleaner 
         <div id="review-body"></div>
       </section>
 
-      <section id="view-settings" class="view" hidden>
-        <div class="page-head">
-          <div>
-            <h1>Settings</h1>
-            <p class="sub">Connect a local model server and choose how reports are written.</p>
-          </div>
+  <section id="view-settings" class="view" hidden>
+    <div class="page-head">
+      <div>
+        <h1>Settings</h1>
+        <p class="sub">Adjust how reports are generated.</p>
+      </div>
+    </div>
+
+    <div class="settings-grid">
+      <div class="panel">
+        <h2>Report defaults</h2>
+
+        <label class="field range-field">
+          <span>Creativity <b id="settings-temp-value">0.2</b></span>
+          <input id="settings-temperature" type="range" min="0" max="0.8" step="0.1" value="0.2" />
+          <small>Lower is more literal. 0.1–0.3 works best for meeting notes.</small>
+        </label>
+
+        <label class="switch-row">
+          <span>
+            <strong>Thorough review by default</strong>
+            <small>Runs a second pass that looks for missed decisions and action items.</small>
+          </span>
+          <input id="settings-thorough" type="checkbox" />
+        </label>
+
+        <div class="settings-actions">
+          <button id="save-settings" class="btn primary" type="button">Save settings</button>
         </div>
+      </div>
 
-        <div class="settings-grid">
-          <div class="panel">
-            <h2>Local AI server</h2>
-            <p class="muted small">Works with Ollama, LM Studio, llama.cpp, Jan and any OpenAI-compatible server.</p>
-
-            <label class="field">
-              <span>Server address</span>
-              <input id="settings-baseurl" type="text" placeholder="http://127.0.0.1:11434" spellcheck="false" />
-            </label>
-
-            <label class="field">
-              <span>Server type</span>
-              <select id="settings-provider">
-                <option value="ollama">Ollama</option>
-                <option value="lmstudio">LM Studio</option>
-                <option value="llamacpp">llama.cpp</option>
-                <option value="jan">Jan</option>
-                <option value="vllm">vLLM</option>
-                <option value="custom">Other / auto-detect</option>
-              </select>
-            </label>
-
-            <div class="row-actions">
-              <button id="test-connection" class="btn ghost small">Test connection</button>
-              <button id="detect-servers" class="btn ghost small">Find servers</button>
-            </div>
-
-            <div id="detected-servers" class="detected-list"></div>
-          </div>
-
-          <div class="panel">
-            <h2>Report defaults</h2>
-
-            <label class="field">
-              <span>Default model</span>
-              <select id="settings-model"></select>
-            </label>
-
-            <label class="field range-field">
-              <span>Creativity <b id="settings-temp-value">0.2</b></span>
-              <input id="settings-temperature" type="range" min="0" max="0.8" step="0.1" value="0.2" />
-              <small>Lower is more literal. 0.1–0.3 works best for meeting notes.</small>
-            </label>
-
-            <label class="switch-row">
-              <span>
-                <strong>Thorough review by default</strong>
-                <small>Runs a second pass that looks for missed decisions and action items.</small>
-              </span>
-              <input id="settings-thorough" type="checkbox" />
-            </label>
-
-            <button id="save-settings" class="btn primary">Save settings</button>
-          </div>
-
-          <div class="panel settings-about">
-            <h2>About this app</h2>
-            <p class="muted small">
-              Minutes runs entirely on your computer. Meeting notes are sent only to the model server you configure above.
-              Reports and their source notes are stored as JSON in the app's <code>data</code> folder.
-            </p>
-            <dl class="about-list">
-              <dt>Recommended models</dt>
-              <dd>qwen2.5:7b-instruct · llama3.1:8b · mistral:7b</dd>
-              <dt>Storage</dt>
-              <dd id="about-data-dir">data/</dd>
-              <dt>Version</dt>
-              <dd>1.0.0</dd>
-            </dl>
-          </div>
-        </div>
-      </section>
+      <div class="panel settings-about">
+        <h2>About this app</h2>
+        <p class="muted small">
+          Minutes runs entirely on your computer. Notes are sent only to the local AI model.
+          Reports and their source notes are stored as JSON in the app's <code>data</code> folder.
+        </p>
+      </div>
+    </div>
+  </section>
     </main>
 
     <div id="overlay" class="overlay" hidden>
@@ -277,12 +236,26 @@ Speaker names, timestamps and half-finished sentences are all fine. The cleaner 
           <span id="elapsed">0s elapsed</span>
           <span id="phase-percent">5%</span>
         </div>
-        <button id="cancel-gen" class="btn ghost small">Cancel</button>
+        <button id="cancel-gen" class="btn ghost small" type="button">Cancel</button>
         <p class="overlay-hint">A seven-billion-parameter model on a laptop GPU usually takes 30–90 seconds.</p>
       </div>
     </div>
 
     <div id="toasts" class="toasts" aria-live="polite"></div>
+
+    <div id="confirm-modal" class="modal-backdrop" hidden>
+      <div class="modal cute-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <div class="modal-head">
+          <div class="modal-icon">🗑️</div>
+          <h3 id="confirm-title">Delete meeting</h3>
+        </div>
+        <p id="confirm-message" class="modal-body">Are you sure you want to delete this meeting? This cannot be undone.</p>
+        <div class="modal-actions">
+          <button id="confirm-cancel" class="btn ghost" type="button">Cancel</button>
+          <button id="confirm-ok" class="btn danger cute-confirm" type="button">Delete</button>
+        </div>
+      </div>
+    </div>
 
     <script type="module" src="/js/app.js"></script>
   </body>

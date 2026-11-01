@@ -184,10 +184,13 @@ function bindStaticEvents() {
     });
   });
 
-  $('#search-input').addEventListener('input', (event) => {
-    state.search = event.target.value.trim().toLowerCase();
-    renderLibrary();
-  });
+  const searchInput = $('#search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (event) => {
+      state.search = event.target.value.trim().toLowerCase();
+      renderLibrary();
+    });
+  }
 
   $('#notes-input').addEventListener('input', (event) => {
     state.notes = event.target.value;
@@ -201,48 +204,65 @@ function bindStaticEvents() {
   });
 
   $('#load-sample').addEventListener('click', loadSample);
-  $('#empty-sample').addEventListener('click', loadSample);
+  $('#empty-sample')?.addEventListener('click', loadSample);
   $('#clear-notes').addEventListener('click', () => setNotes(''));
   $('#analyze').addEventListener('click', analyze);
-  $('#refresh-models').addEventListener('click', () => {
-    loadModels(true).catch((err) => toast(err.message, 'error'));
-    refreshProviders();
-  });
+  const refreshModels = $('#refresh-models');
+  if (refreshModels) {
+    refreshModels.addEventListener('click', () => {
+      loadModels(true).catch((err) => toast(err.message, 'error'));
+      refreshProviders().catch(() => {});
+    });
+  }
 
   const dropzone = $('#dropzone');
-  ['dragenter', 'dragover'].forEach((type) =>
-    dropzone.addEventListener(type, (event) => {
-      event.preventDefault();
-      dropzone.classList.add('dragover');
-    }),
-  );
-  ['dragleave', 'drop'].forEach((type) =>
-    dropzone.addEventListener(type, (event) => {
-      event.preventDefault();
-      dropzone.classList.remove('dragover');
-    }),
-  );
-  dropzone.addEventListener('drop', (event) => {
-    const file = event.dataTransfer?.files?.[0];
-    if (file) uploadFile(file);
-  });
+  if (dropzone) {
+    ['dragenter', 'dragover'].forEach((type) =>
+      dropzone.addEventListener(type, (event) => {
+        event.preventDefault();
+        dropzone.classList.add('dragover');
+      }),
+    );
+    ['dragleave', 'drop'].forEach((type) =>
+      dropzone.addEventListener(type, (event) => {
+        event.preventDefault();
+        dropzone.classList.remove('dragover');
+      }),
+    );
+    dropzone.addEventListener('drop', (event) => {
+      const file = event.dataTransfer?.files?.[0];
+      if (file) uploadFile(file);
+    });
+  }
 
-  $('#model-select').addEventListener('change', (event) => {
-    state.settings.model = event.target.value;
-    updateAiPill();
-    scheduleSettingsSave();
-  });
-  $('#temperature').addEventListener('input', (event) => {
-    state.settings.temperature = Number(event.target.value);
-    updateTemperatureLabels();
-    scheduleSettingsSave();
-  });
-  $('#thorough').addEventListener('change', (event) => {
-    state.settings.thorough = event.target.checked;
-    scheduleSettingsSave();
-  });
+  const modelSelect = $('#model-select');
+  if (modelSelect) {
+    modelSelect.addEventListener('change', (event) => {
+      if (!state.settings) state.settings = {};
+      state.settings.model = event.target.value;
+      updateAiPill();
+      scheduleSettingsSave();
+    });
+  }
+  const tempSelect = $('#temperature');
+  if (tempSelect) {
+    tempSelect.addEventListener('input', (event) => {
+      if (!state.settings) state.settings = {};
+      state.settings.temperature = Number(event.target.value);
+      updateTemperatureLabels();
+      scheduleSettingsSave();
+    });
+  }
+  const thoroughToggle = $('#thorough');
+  if (thoroughToggle) {
+    thoroughToggle.addEventListener('change', (event) => {
+      if (!state.settings) state.settings = {};
+      state.settings.thorough = event.target.checked;
+      scheduleSettingsSave();
+    });
+  }
 
-  $('#ai-pill').addEventListener('click', () => {
+  $('#ai-pill')?.addEventListener('click', () => {
     location.hash = '#/settings';
   });
 
@@ -256,26 +276,30 @@ function bindStaticEvents() {
   document.addEventListener('input', onReviewInput);
   document.addEventListener('click', onReviewClick);
 
-  $('#save-settings').addEventListener('click', saveSettings);
-  $('#test-connection').addEventListener('click', testConnection);
-  $('#detect-servers').addEventListener('click', async () => {
-    const button = $('#detect-servers');
-    button.disabled = true;
-    try {
-      await refreshProviders();
-      renderDetectedServers();
-      toast(state.providers.length ? `Found ${state.providers.length} local server(s).` : 'No local servers found.', state.providers.length ? 'success' : 'error');
-    } finally {
-      button.disabled = false;
-    }
-  });
-  $('#settings-temperature').addEventListener('input', updateTemperatureLabels);
-  $('#settings-baseurl').addEventListener('change', () => {
-    loadModels(true).catch((err) => toast(err.message, 'error'));
-  });
-  $('#settings-provider').addEventListener('change', () => {
-    loadModels(true).catch((err) => toast(err.message, 'error'));
-  });
+  const saveSettingsBtn = $('#save-settings');
+  if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSettings);
+  const testConn = $('#test-connection');
+  if (testConn) testConn.addEventListener('click', testConnection);
+  const detectBtn = $('#detect-servers');
+  if (detectBtn) {
+    detectBtn.addEventListener('click', async () => {
+      const button = detectBtn;
+      button.disabled = true;
+      try {
+        await refreshProviders();
+        renderDetectedServers();
+        toast(state.providers.length ? `Found ${state.providers.length} local server(s).` : 'No local servers found.', state.providers.length ? 'success' : 'error');
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+  const st = $('#settings-temperature');
+  if (st) st.addEventListener('input', updateTemperatureLabels);
+  const sbu = $('#settings-baseurl');
+  if (sbu) sbu.addEventListener('change', () => { loadModels(true).catch((err) => toast(err.message, 'error')); });
+  const sp = $('#settings-provider');
+  if (sp) sp.addEventListener('change', () => { loadModels(true).catch((err) => toast(err.message, 'error')); });
 
   document.addEventListener('keydown', (event) => {
     if (!(event.ctrlKey || event.metaKey)) return;
@@ -307,23 +331,37 @@ function bindStaticEvents() {
 
 function hydrateSettingsForm() {
   if (!state.settings) return;
-  $('#settings-baseurl').value = state.settings.baseUrl || '';
-  const provider = state.settings.provider || 'ollama';
-  $('#settings-provider').value = ['ollama', 'lmstudio', 'llamacpp', 'jan', 'vllm'].includes(provider)
-    ? provider
-    : 'custom';
-  $('#settings-temperature').value = state.settings.temperature ?? 0.2;
-  $('#settings-thorough').checked = Boolean(state.settings.thorough);
-  $('#temperature').value = state.settings.temperature ?? 0.2;
-  $('#thorough').checked = Boolean(state.settings.thorough);
+  const baseUrl = $('#settings-baseurl');
+  if (baseUrl) baseUrl.value = state.settings.baseUrl || '';
+  const provider = $('#settings-provider');
+  if (provider) {
+    const p = state.settings.provider || 'ollama';
+    provider.value = ['ollama', 'lmstudio', 'llamacpp', 'jan', 'vllm'].includes(p) ? p : 'custom';
+  }
+  const st = $('#settings-temperature');
+  if (st) st.value = state.settings.temperature ?? 0.2;
+  const sth = $('#settings-thorough');
+  if (sth) sth.checked = Boolean(state.settings.thorough);
+  const t = $('#temperature');
+  if (t) t.value = state.settings.temperature ?? 0.2;
+  const th = $('#thorough');
+  if (th) th.checked = Boolean(state.settings.thorough);
   updateTemperatureLabels();
 }
 
 function updateTemperatureLabels() {
-  const composerValue = Number($('#temperature').value || 0);
-  $('#temp-value').textContent = composerValue.toFixed(1);
-  const settingsValue = Number($('#settings-temperature').value || 0);
-  $('#settings-temp-value').textContent = settingsValue.toFixed(1);
+  const composerEl = $('#temperature');
+  if (composerEl) {
+    const composerValue = Number(composerEl.value || 0);
+    const cv = $('#temp-value');
+    if (cv) cv.textContent = composerValue.toFixed(1);
+  }
+  const settingsEl = $('#settings-temperature');
+  if (settingsEl) {
+    const settingsValue = Number(settingsEl.value || 0);
+    const sv = $('#settings-temp-value');
+    if (sv) sv.textContent = settingsValue.toFixed(1);
+  }
 }
 
 function scheduleSettingsSave() {
@@ -338,28 +376,36 @@ function scheduleSettingsSave() {
 }
 
 async function saveSettings() {
-  const baseUrl = $('#settings-baseurl').value.trim();
-  const provider = $('#settings-provider').value;
-  const model = $('#settings-model').value;
-  const temperature = Number($('#settings-temperature').value);
-  const thorough = $('#settings-thorough').checked;
-  if (!baseUrl) return toast('Enter the address of your local AI server.', 'error');
+  const baseUrlEl = $('#settings-baseurl');
+  const providerEl = $('#settings-provider');
+  const modelEl = $('#settings-model');
+  const tempEl = $('#settings-temperature');
+  const thrEl = $('#settings-thorough');
+  const baseUrl = (baseUrlEl?.value || state.settings?.baseUrl || '').trim();
+  const provider = providerEl?.value || state.settings?.provider || 'ollama';
+  const model = modelEl?.value || state.settings?.model || '';
+  const temperature = tempEl ? Number(tempEl.value) : (state.settings?.temperature ?? 0.2);
+  const thorough = thrEl ? thrEl.checked : Boolean(state.settings?.thorough);
+  if (baseUrlEl && !baseUrl) return toast('Enter the address of your local AI server.', 'error');
 
   try {
     state.settings = await api.put('/api/settings', { baseUrl, provider, model, temperature, thorough });
     hydrateSettingsForm();
-    $('#thorough').checked = thorough;
+    if ($('#thorough')) $('#thorough').checked = thorough;
     toast('Settings saved.', 'success');
-    await loadModels();
-    await loadHealth();
+    await loadModels().catch(() => {});
+    await loadHealth().catch(() => {});
   } catch (err) {
     toast(err.message, 'error');
   }
 }
 
 async function testConnection() {
-  const baseUrl = $('#settings-baseurl').value.trim();
-  const provider = $('#settings-provider').value;
+  const baseUrlEl = $('#settings-baseurl');
+  const providerEl = $('#settings-provider');
+  if (!baseUrlEl) return;
+  const baseUrl = baseUrlEl.value.trim();
+  const provider = providerEl?.value || 'ollama';
   const button = $('#test-connection');
   button.disabled = true;
   try {
@@ -429,19 +475,26 @@ function updateOfflineCard() {
 }
 
 async function loadModels(notify = false) {
-  const baseUrl = state.route === 'settings' ? $('#settings-baseurl').value.trim() : state.settings?.baseUrl;
-  const provider = state.route === 'settings' ? $('#settings-provider').value : state.settings?.provider;
-  const query = new URLSearchParams({ baseUrl: baseUrl || '', provider: provider || 'ollama' });
-  const data = await api.get(`/api/models?${query.toString()}`);
-  state.models = data.models || [];
-  populateModelSelects();
-  if (!state.settings.model && state.models.length) {
-    state.settings.model = state.models[0].id;
-    scheduleSettingsSave();
+  const baseUrlEl = $('#settings-baseurl');
+  const providerEl = $('#settings-provider');
+  const baseUrl = state.route === 'settings' && baseUrlEl ? baseUrlEl.value.trim() : state.settings?.baseUrl;
+  const provider = state.route === 'settings' && providerEl ? providerEl.value : state.settings?.provider;
+  try {
+    const query = new URLSearchParams({ baseUrl: baseUrl || '', provider: provider || 'ollama' });
+    const data = await api.get(`/api/models?${query.toString()}`);
+    state.models = data.models || [];
+    populateModelSelects();
+    if (!state.settings.model && state.models.length) {
+      state.settings.model = state.models[0].id;
+      scheduleSettingsSave();
+    }
+    updateAiPill(true, state.settings?.model || state.models[0]?.name);
+    if (notify) toast(`${state.models.length} model(s) available.`, state.models.length ? 'success' : 'error');
+    return state.models;
+  } catch (err) {
+    if (notify) toast(err.message, 'error');
+    return [];
   }
-  updateAiPill(true, state.settings?.model || state.models[0]?.name);
-  if (notify) toast(`${state.models.length} model(s) available.`, state.models.length ? 'success' : 'error');
-  return state.models;
 }
 
 function populateModelSelects() {
@@ -489,14 +542,14 @@ async function route() {
     hydrateSettingsForm();
     renderDetectedServers();
     loadModels().catch(() => {});
-    document.title = 'Settings — Minutes';
+    document.title = 'Settings — mefile';
   } else {
     state.route = 'library';
     if (wasReview) flushSave();
     state.current = null;
     showView('library');
     renderLibrary();
-    document.title = 'Minutes — local meeting reports';
+    document.title = 'mefile — local meeting reports';
   }
   updateNav();
 }
@@ -525,7 +578,7 @@ async function openMeeting(id) {
     if (meeting.result) {
       showView('review');
       renderReview();
-      document.title = `${meeting.title} — Minutes`;
+      document.title = `${meeting.title} — mefile`;
     } else {
       state.route = 'composer';
       state.notes = meeting.source?.notes || '';
@@ -534,7 +587,7 @@ async function openMeeting(id) {
       showView('composer');
       hydrateComposer();
       updateNav();
-      document.title = 'New report — Minutes';
+      document.title = 'New report — mefile';
     }
   } catch (err) {
     toast(err.message, 'error');
@@ -1029,7 +1082,8 @@ function onReviewClick(event) {
 
 async function deleteMeeting(id) {
   const meeting = state.meetings.find((m) => m.id === id);
-  if (!window.confirm(`Delete “${meeting?.title || 'this meeting'}”? This cannot be undone.`)) return;
+  const confirmed = await confirmDelete(`Delete “${meeting?.title || 'this meeting'}”? This cannot be undone.`);
+  if (!confirmed) return;
   try {
     await api.del(`/api/meetings/${id}`);
     state.meetings = state.meetings.filter((m) => m.id !== id);
@@ -1308,6 +1362,43 @@ async function exportReport(kind, preview = false) {
     anchor.remove();
     toast('PDF downloaded.', 'success');
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* confirm modal                                                       */
+/* ------------------------------------------------------------------ */
+
+let confirmResolve = null;
+
+function confirmDelete(message) {
+  const backdrop = $('#confirm-modal');
+  const msg = $('#confirm-message');
+  const ok = $('#confirm-ok');
+  const cancel = $('#confirm-cancel');
+  if (!backdrop) return Promise.resolve(window.confirm(message));
+  msg.textContent = message;
+  backdrop.hidden = false;
+  document.body.style.overflow = 'hidden';
+  return new Promise((resolve) => {
+    confirmResolve = resolve;
+    const cleanup = (result) => {
+      backdrop.hidden = true;
+      document.body.style.overflow = '';
+      ok.removeEventListener('click', onOk);
+      cancel.removeEventListener('click', onCancel);
+      backdrop.removeEventListener('click', onBackdrop);
+      confirmResolve = null;
+      resolve(result);
+    };
+    const onOk = () => cleanup(true);
+    const onCancel = () => cleanup(false);
+    const onBackdrop = (e) => {
+      if (e.target === backdrop) cleanup(false);
+    };
+    ok.addEventListener('click', onOk);
+    cancel.addEventListener('click', onCancel);
+    backdrop.addEventListener('click', onBackdrop);
+  });
 }
 
 /* ------------------------------------------------------------------ */
