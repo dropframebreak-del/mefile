@@ -1,0 +1,21 @@
+{
+  "name": "meeting-notes-pdf",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Turn meeting notes into well-organised PDF reports with a local AI model.",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20.11"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "multer": "^2.5.0",
+    "pdfmake": "^0.3.13"
+  }
+}

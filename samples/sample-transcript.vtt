@@ -1,0 +1,88 @@
+WEBVTT
+
+00:00:02.000 --> 00:00:09.000
+Priya (Product Lead): Morning everyone. This is the Q4 checkout reliability review. We have 45 minutes. Goal is to decide on the payment retry work and lock the November release scope.
+
+00:00:09.500 --> 00:00:18.000
+Arjun (Engineering Manager): Quick context. Checkout failures went from 1.8% to 3.4% after the gateway migration on the 12th. Most of it is timeouts on UPI collect.
+
+00:00:18.500 --> 00:00:31.000
+Meera (Support Lead): Support tickets are up 62% this month. The top complaint is "payment stuck" and then people retry manually. We had 214 tickets last week alone.
+
+00:00:32.000 --> 00:00:44.000
+Arjun: Root cause looks like our retry logic hammering the gateway. We send three retries in 400ms. The gateway rate-limits us after that and the collect never resolves.
+
+00:00:45.000 --> 00:00:58.000
+Priya: So the fix is exponential backoff, right?
+
+00:00:58.500 --> 00:01:12.000
+Arjun: Backoff plus idempotency keys. Right now a retry can double-charge in rare cases. We saw 11 suspected duplicates in the logs. Finance flagged two of them.
+
+00:01:12.500 --> 00:01:25.000
+Ravi (Finance): Two actual duplicates, both refunded. We need this fixed before Black Friday. If it happens at volume it becomes a compliance issue, not just support.
+
+00:01:26.000 --> 00:01:40.000
+Priya: Agreed. Let's treat double-charge prevention as P0. Arjun, can you own the idempotency work?
+
+00:01:40.500 --> 00:01:49.000
+Arjun: Yes. I'll need two engineers for about a week. Say by the 6th of November.
+
+00:01:50.000 --> 00:02:05.000
+Meera: While that ships, can support get a way to see payment state without asking engineering? Right now every stuck payment is a Slack thread.
+
+00:02:05.500 --> 00:02:16.000
+Priya: Good point. A read-only payment timeline in the admin panel. Small scope. Meera, write up the fields you need by Friday and we'll size it.
+
+00:02:17.000 --> 00:02:30.000
+Meera: Will do. I'd want gateway response code, retry count, and the last webhook time.
+
+00:02:31.000 --> 00:02:47.000
+Arjun: One more thing. The gateway's sandbox doesn't reproduce the rate limit, so we can't test this properly before production. We'd need their staging keys. That's been pending for three weeks.
+
+00:02:47.500 --> 00:03:02.000
+Priya: That's a real blocker. Ravi, can finance push the vendor on staging access? They respond faster to commercial pressure.
+
+00:03:02.500 --> 00:03:14.000
+Ravi: I'll escalate to our account manager today. If we don't have keys by Wednesday we should consider a canary rollout instead.
+
+00:03:15.000 --> 00:03:28.000
+Priya: Decision: we ship the backoff change behind a feature flag on the 8th, canary at 5% for 48 hours. If error rate doesn't improve by 20% we roll back. Everyone okay?
+
+00:03:28.500 --> 00:03:34.000
+Arjun: Fine by me.
+
+00:03:34.500 --> 00:03:40.000
+Ravi: Agreed, but I want a daily failure report during the canary.
+
+00:03:41.000 --> 00:03:52.000
+Priya: Done. Arjun, include the failure rate by gateway in the daily report.
+
+00:03:53.000 --> 00:04:08.000
+Meera: Can we also update the customer-facing error message? "Payment failed" is scary. Something like "We're confirming your payment, don't retry for 10 minutes."
+
+00:04:08.500 --> 00:04:20.000
+Priya: Yes, let's do that. Meera owns the copy, Arjun owns the implementation. Ship with the canary.
+
+00:04:21.000 --> 00:04:35.000
+Arjun: Note for the record: this touches the checkout service and the notification service. We'll need a coordinated deploy. I'll write the runbook.
+
+00:04:36.000 --> 00:04:50.000
+Priya: Anything else? ... Okay. Open question: do we delay the BNPL launch? It was planned for the 15th and it depends on the same gateway.
+
+00:04:50.500 --> 00:05:06.000
+Ravi: I'd delay it by two weeks. Launching a new payment method on an unstable gateway is asking for trouble.
+
+00:05:06.500 --> 00:05:18.000
+Arjun: Agreed, but marketing has already announced it. We need a messaging plan.
+
+00:05:18.500 --> 00:05:29.000
+Priya: Let's not decide today. I'll take it to the leadership sync on Monday with a recommendation to move BNPL to the 29th. Marketing comms is a risk either way.
+
+00:05:30.000 --> 00:05:44.000
+Priya: Last item, metrics. How will we know this worked? Arjun, define the success metric and baseline by end of day tomorrow.
+
+00:05:44.500 --> 00:05:58.000
+Arjun: Success is checkout failure rate back under 2% and duplicate charges at zero. I'll pull the last 90 days as baseline.
+
+00:05:59.000 --> 00:06:10.000
+Priya: Great. Next meeting is Thursday the 7th at 10am, same link. Focus is canary results. Please come with numbers, not anecdotes. Thanks everyone.
