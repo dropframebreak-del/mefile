@@ -1,4 +1,4 @@
-# Minutes — local meeting reports
+   # mefile — local meeting reports
 
 Paste messy meeting notes or a transcript. A language model running on your own
 machine turns them into a structured, print-ready PDF report: cover page, table of
