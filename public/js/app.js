@@ -602,7 +602,7 @@ function openComposer() {
   }
   showView('composer');
   hydrateComposer();
-  document.title = 'New report — Minutes';
+  document.title = 'New report — mefile';
 }
 
 function hydrateComposer() {
@@ -1333,7 +1333,7 @@ function renderReview() {
   $('#review-body').innerHTML = hero + summary + attendees + agenda + discussion + decisions + actions + risks + questions + next + statsCard;
   updateCounts();
   setSaveState(state.dirty ? 'Unsaved' : 'Saved', state.dirty ? '' : 'saved');
-  document.title = `${meeting.title} — Minutes`;
+  document.title = `${meeting.title} — mefile`;
 }
 
 async function exportReport(kind, preview = false) {

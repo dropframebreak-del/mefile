@@ -392,9 +392,9 @@ function buildDocDefinition(meeting) {
   return {
     info: {
       title: result.title || 'Meeting report',
-      author: 'Meeting Notes PDF',
+      author: 'mefile',
       subject: result.objective || 'Meeting report',
-      creator: 'Meeting Notes PDF (local)',
+      creator: 'mefile (local)',
     },
     pageSize: 'A4',
     pageMargins: [MARGIN, 64, MARGIN, 70],
