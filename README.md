@@ -5,6 +5,8 @@ machine turns them into a structured, print-ready PDF report: cover page, table 
 contents, executive summary, discussion, decisions, an action-item table with
 checkboxes, risks, open questions and page numbers.
 
+![mefile library page](docs/library.png)
+
 Nothing is sent to a cloud API. Notes go to a model server on `127.0.0.1` and the
 result is stored as JSON on disk.
 
