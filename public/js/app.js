@@ -429,7 +429,8 @@ async function loadHealth() {
   try {
     state.health = await api.get('/api/health');
     updateAiPill(state.health.ai?.online, state.health.ai?.model);
-    if (state.health.dataDir) $('#about-data-dir').textContent = state.health.dataDir;
+    const dataDirEl = $('#about-data-dir');
+    if (state.health.dataDir && dataDirEl) dataDirEl.textContent = state.health.dataDir;
   } catch {
     updateAiPill(false);
   }
